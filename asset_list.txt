@@ -1,0 +1,19 @@
+PLAYER:
+- FACE LEFT
+- FACE RIGHT
+- FACE UP
+- FACE DOWN 
+
+INVENTORY:
+- ARROW
+
+OBJECTS:
+- Pit
+- Wumpus
+- Breeze
+- Strench
+- Gold
+- Breeze + Strench
+- Breeze + Gold
+- Strench + Gold
+- Breeze + Strench + Gold
