@@ -7,6 +7,7 @@ class WumpusWorld:
         self.width = 0
         self.__numGold = 0        
         self.listTiles = []
+        self.coordDoor = None
 
     def get_Adjacents(self, i, j):
         adj = []
@@ -57,7 +58,8 @@ class WumpusWorld:
                             for a in adj:
                                 (self.listTiles[a[0]][a[1]]).setStrench()
                         if 'A' in tiles[i][j]:
-                            (self.listTiles[i][j]).setPlayer()    
+                            (self.listTiles[i][j]).setPlayer()
+                            self.coordDoor =  (i, j)
         except IOError:
             return None
 
