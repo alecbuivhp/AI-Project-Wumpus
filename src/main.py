@@ -1,2 +1,3 @@
-import os
+from tkinter import *
 
+root = Tk()

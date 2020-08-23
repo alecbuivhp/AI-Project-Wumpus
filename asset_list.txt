@@ -1,19 +1,17 @@
 PLAYER:
-- FACE LEFT
-- FACE RIGHT
-- FACE UP
-- FACE DOWN 
+OK - FACE LEFT
+OK - FACE RIGHT
+OK - FACE UP
+OK - FACE DOWN 
 
 INVENTORY:
-- ARROW
+OK - ARROW LEFT
+OK - ARROW RIGHT
+OK - ARROW UP
+OK - ARROW DOWN
 
 OBJECTS:
-- Pit
-- Wumpus
-- Breeze
-- Strench
-- Gold
-- Breeze + Strench
-- Breeze + Gold
-- Strench + Gold
-- Breeze + Strench + Gold
+OK - Pit
+OK - Wumpus
+OK - Gold
+OK - TERRAIN
