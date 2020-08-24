@@ -10,7 +10,7 @@ class Board:
         self.root = Tk()
         self.root.title("WUMPUS WORLD")
 
-        self.canvas = Canvas(self.root, width=64*world.width, height=64*world.height, background='white')
+        self.canvas = Canvas(self.root, width=64 * world.width, height=64 * world.height + 64, background='white')
         self.canvas.pack()
 
         self.root.bind("<Key>", self.updateBoard)
@@ -22,6 +22,9 @@ class Board:
         self.warnings = []
         self.terrains = []
         self.player = None
+        self.display_score = None
+
+        self.scoreFont = font.Font(family='KacstBook', size=22)
 
         # Load images
         self.DOOR = PhotoImage(file='assets/door.png')
@@ -115,8 +118,11 @@ class Board:
                     terrains_line.append(self.canvas.create_image(64 * j, 64 * i, image=self.TERRAIN, anchor=NW))
             self.terrains.append(terrains_line)
 
-        self.world.printWorld()
+        #self.world.printWorld()
 
+        self.canvas.create_rectangle(0, 64 * self.world.height, 64 * self.world.width, 64 * self.world.height + 64, fill='#85888a')
+        self.canvas.create_image(64, 64 * self.world.height + 16, image=self.SCORE, anchor=NW)
+        self.score_display = self.canvas.create_text(64 + 64, 64 * self.world.height + 16, fill='#ffff00', font=self.scoreFont, text=str(self.score), anchor=NW)
 
     ############################# ACTIONS #############################
     
@@ -154,13 +160,20 @@ class Board:
             self.agent.currentState = action
 
             self.score -= 10
+            self.canvas.itemconfig(self.score_display, text=str(self.score))
 
             tile_at_loc = self.world.listTiles[self.agentPos[0]][self.agentPos[1]]
             if tile_at_loc.getPit():
                 self.score -= 10000
+                self.canvas.itemconfig(self.score_display, text=str(self.score))
+                self.canvas.update()
+                time.sleep(0.5)
                 self.endGame("Pit")
             elif tile_at_loc.getWumpus():
                 self.score -= 10000
+                self.canvas.itemconfig(self.score_display, text=str(self.score))
+                self.canvas.update()
+                time.sleep(0.5)
                 self.endGame("Wumpus")
 
 
@@ -185,6 +198,8 @@ class Board:
         self.canvas.delete(arrow)
 
         self.score -= 100
+        self.canvas.itemconfig(self.score_display, text=str(self.score))
+
 
         if self.world.listTiles[arrow_loc[0]][arrow_loc[1]].getWumpus():
             # UPDATE WORLD
@@ -211,6 +226,7 @@ class Board:
     def grabGold(self):
         if self.world.listTiles[self.agentPos[0]][self.agentPos[1]].getGold():
             self.score += 100
+            self.canvas.itemconfig(self.score_display, text=str(self.score))
 
             # UPDATE WORLD
             self.world.grabGold(self.agentPos[0], self.agentPos[1])
@@ -221,17 +237,8 @@ class Board:
 
             self.canvas.delete(self.tiles[self.agentPos[0]][self.agentPos[1]])
             self.tiles[self.agentPos[0]][self.agentPos[1]] = self.canvas.create_image(64 * self.agentPos[1], 64 * self.agentPos[0], image=self.TILE, anchor=NW)
-
-                # Redraw player because of overlapping
-            self.canvas.delete(self.player)
-            if self.agent.currentState == bind.Action.LEFT:
-                self.player = self.canvas.create_image(64 * self.agentPos[1], 64 * self.agentPos[0], image=self.PLAYER_LEFT, anchor=NW)
-            elif self.agent.currentState == bind.Action.RIGHT:
-                self.player = self.canvas.create_image(64 * self.agentPos[1], 64 * self.agentPos[0], image=self.PLAYER_RIGHT, anchor=NW)
-            elif self.agent.currentState == bind.Action.UP:
-                self.player = self.canvas.create_image(64 * self.agentPos[1], 64 * self.agentPos[0], image=self.PLAYER_UP, anchor=NW)
-            elif self.agent.currentState == bind.Action.DOWN:
-                self.player = self.canvas.create_image(64 * self.agentPos[1], 64 * self.agentPos[0], image=self.PLAYER_DOWN, anchor=NW)
+            
+            self.canvas.tag_raise(self.player, self.tiles[self.agentPos[0]][self.agentPos[1]])
 
             # END GAME ?
             if not self.world.leftWumpus() and not self.world.leftGold():
@@ -240,6 +247,7 @@ class Board:
 
     def endGame(self, reason):
         self.canvas.delete("all")
+        self.canvas.config(width=64 * self.world.width, height=64 * self.world.height)
         self.canvas.create_rectangle(0, 0, 64 * self.world.width, 64 * self.world.height, fill='#704917')
 
         endFont = font.Font(family='KacstBook', size=35, weight='bold')
@@ -255,9 +263,10 @@ class Board:
         elif reason == 'Clear':
             self.canvas.create_text((64 * self.world.width) // 2, ((64 * self.world.height) // 2) // 2 + 64, fill='#d5d5d5', font=reasonFont, text='You cleared the Map', anchor=CENTER)
 
-        scoreFont = font.Font(family='KacstBook', size=22)
-        self.canvas.create_image((64 * self.world.width) // 2 - 64, ((64 * self.world.height) // 2) + 64 + 60, image=self.SCORE, anchor=CENTER)
-        self.canvas.create_text((64 * self.world.width) // 2 + len(str(self.score)) * 6, ((64 * self.world.height) // 2) + 64 + 60, fill='#dac400', font=scoreFont, text=str(self.score), anchor=CENTER)
+        self.canvas.create_image((64 * self.world.width) // 2 - 70, ((64 * self.world.height) // 2) + 64 + 30, image=self.SCORE, anchor=NW)
+        self.canvas.create_text((64 * self.world.width) // 2, ((64 * self.world.height) // 2) + 124 - 30, fill='#ffff00', font=self.scoreFont, text=str(self.score), anchor=NW)
+
+        self.root.unbind("<Key>")
 
     ############################# INPUT AND UPDATE GAME #############################
 
@@ -298,7 +307,7 @@ class Board:
                 self.score += 10
                 self.endGame("Climb")
 
-        self.world.printWorld()
+        # self.world.printWorld()
         
     ############################# MAIN LOOP #############################
 
