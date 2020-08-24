@@ -5,9 +5,10 @@ class WumpusWorld:
         """Initialize an empty board"""
         self.height = 0
         self.width = 0
-        self.__numGold = 0        
+        self.__numGold = 0
+        self.__numWumpus = 0    
         self.listTiles = []
-        self.coordDoor = None
+        self.doorPos = None
 
     def get_Adjacents(self, i, j):
         adj = []
@@ -54,17 +55,53 @@ class WumpusWorld:
                                 (self.listTiles[a[0]][a[1]]).setBreeze()
                         if 'W' in tiles[i][j]:
                             (self.listTiles[i][j]).setWumpus()    
+                            self.__numWumpus += 1
                             adj = self.get_Adjacents(i, j)
                             for a in adj:
                                 (self.listTiles[a[0]][a[1]]).setStrench()
                         if 'A' in tiles[i][j]:
                             (self.listTiles[i][j]).setPlayer()
-                            self.coordDoor =  (i, j)
+                            self.doorPos =  (i, j)
         except IOError:
             return None
 
     def generate_Map(self, numPit, numWumpus, numGold):
         pass
 
-    def update_Tile(self, i, j, is_Pit, isdead_Wumpus, islooted_Gold):
-        pass
+    def grabGold(self, i , j):
+        self.__numGold -= 1
+        self.listTiles[i][j].removeGold()
+    
+    def killWumpus(self, i, j):
+        self.__numWumpus -= 1
+        self.listTiles[i][j].removeWumpus()
+        adj = self.get_Adjacents(i, j)
+        for a in adj:
+            if self.listTiles[a[0]][a[1]].getStrench():
+                self.listTiles[a[0]][a[1]].removeStrench()
+
+    def movePlayer(self, before_i, before_j, after_i, after_j):
+        self.listTiles[before_i][before_j].removePlayer()
+        self.listTiles[after_i][after_j].setPlayer()
+
+    def leftGold(self):
+        return False if self.__numGold == 0 else True
+
+    def leftWumpus(self):
+        return False if self.__numWumpus == 0 else True
+
+
+    ################################# DEBUGGING #################################
+
+    def printWorld(self):
+        string = []
+        for i in range(self.height):
+            line = []
+            for j in range(self.width):
+                line.append(self.listTiles[i][j].printTile())
+            string.append(line)
+        
+        for i in string:
+            print(i)
+
+        print()
