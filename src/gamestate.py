@@ -1,5 +1,6 @@
 from src import world
-class Node:
+from src.tile import *
+class Node(Tile):
     def __init__(self,row,col):
         self.row = row
         self.col = col
@@ -7,16 +8,17 @@ class Node:
         self.left = ''
         self.right = ''
         self.up = ''
-        self.down = ''
+        self.down = '' #1,2.left = "2,2"
 
 
 
 class GameState:
     def __init__(self,world):
         self.visited = []
-        self.unvisited = []
+        self.unvisited_safe = []
         self.state = dict()
-        self.max_row,self.max_col = world.getSizeMap()
+        self.max_row= world.height
+        self.max_col = world.width
 
     def add_state(self,node):
         #FIX ME LATER

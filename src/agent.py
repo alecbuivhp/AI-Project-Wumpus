@@ -1,5 +1,7 @@
 from src.gamestate import *
 from src.kb import *
+from src.bind import *
+from src.world import *
 
 class Agent:
     def __init__(self ,state, direction):
@@ -31,8 +33,6 @@ class Agent:
     def turn_down(self):
         self.current_direction = "Down"
 
-    def shoot(self):
-        pass
 
 class Level_solver(Agent):
     #FIX starting node
@@ -50,9 +50,112 @@ class Level_solver(Agent):
 
         def getAction(self,current_tile):
             current_node = self.state.state[self.agent.current_state]
-            if current_node.name == starting_node and current_tile.getStench() and not current_tile.getBreeze():
+            if current_node.name == starting_node and current_node.getStench() and not current_node.getBreeze():
                 self.start_stench = True
-                self.shoot()
+                sentence = world.get_Adjacents(current_node.row, current_node.col)
+                for adjecent in sentence:
+                    self.KB.add(['W'+ str(adjecent)])
+                self.move.append(('Right', Action.SHOOT))
+
+            elif current_node.getStench():
+                self.KB.add(['~W'+current_node.right])
+                self.move.append(('Up', Action.SHOOT))
+
+            elif current_node.getStench():
+                self.KB.add(['~W'+current_node.up])
+                self.move.append(('Left',Action.SHOOT))
+
+            elif current_node.getStench():
+                self.KB.add(['~W'+current_node.left])
+                self.move.append(('Down', Action.SHOOT))
+                self.KB.add(['~W'+current_node.down])
+            else:
+                self.start_stench = False
+                self.clearKB()
+
+        def clearKB(self):
+            remove = []
+            for item in self.KB.KB:
+                if item[0][0] == 'W' or item[0][1] == 'W':
+                    remove.append(item)
+            for item in remove:
+                self.KB.KB.remove(item)
 
 
+        def handle_breeze(self,current_node):
+            sentence = []
+            prefix = ''
+            current_prefix = ''
+            if current_node.getBreeze():
+                prefix = 'P'
+                current_prefix = 'B'
+            elif not current_node.getBreeze():
+                prefix = '~P'
+                current_prefix = '~B'
 
+            if current_node.right not in self.state.visited and current_node.right == 'Wall':
+                sentence.append(prefix + current_node.right)
+            if current_node.up not in self.state.visited and current_node.up == 'Wall':
+                sentence.append(prefix + current_node.up)
+            if current_node.left not in self.state.visited and current_node.left == 'Wall':
+                sentence.append(prefix + current_node.left)
+            if current_node.down not in self.state.visited and current_node.down == 'Wall':
+                sentence.append(prefix + current_node.down)
+            self.KB.add(sentence)
+            self.KB.add([current_prefix + current_node.name])
+
+        def handle_stench(self,current_node):
+            sentence = []
+            prefix = ''
+            current_prefix = ''
+            if current_node.getStench():
+                prefix = 'W'
+                current_prefix = 'S'
+            elif not current_node.getStench():
+                prefix = '~W'
+                current_prefix = '~S'
+            if current_node.right not in self.state.visited and current_node.right == 'Wall':
+                sentence.append(prefix + current_node.right)
+            if current_node.up not in self.state.visited and current_node.up == 'Wall':
+                sentence.append(prefix + current_node.up)
+            if current_node.left not in self.state.visited and current_node.left == 'Wall':
+                sentence.append(prefix + current_node.left)
+            if current_node.down not in self.state.visited and current_node.down == 'Wall':
+                sentence.append(prefix + current_node.down)
+            self.KB.add(sentence)
+            self.KB.add([current_prefix+ current_node.name])
+
+        def check_safe(self, current_node):
+            if current_node.right != 'Wall' and current_node.right not in self.state.visited and current_node.right not in self.state.unvisited_safe:
+                # alpha = \neg U . Safe => U = '~W' => \neg U = 'W'
+                if self.KB.check(['W'+current_node.right]) and self.KB.check(['P'+current_node.right]):
+                    self.state.unvisited_safe.append(current_node.right)
+
+            if current_node.up != 'Wall' and current_node.up not in self.state.visited and current_node.up not in self.state.unvisited_safe:
+                if self.KB.check(['W'+current_node.up]) and self.KB.check(['P'+current_node.up]):
+                    self.state.unvisited_safe.append(current_node.up)
+
+            if current_node.left != 'Wall' and current_node.left not in self.state.visited and current_node.left not in self.state.unvisited_safe:
+                if self.KB.check(['W'+current_node.left]) and self.KB.check(['P'+current_node.left]):
+                    self.state.unvisited_safe.append(current_node.left)
+
+            if current_node.down != 'Wall' and current_node.down not in self.state.visited and current_node.down not in self.state.unvisited_safe:
+                if self.KB.check(['W'+current_node.down]) and self.KB.check(['P'+current_node.down]):
+                    self.state.unvisited_safe.append(current_node.down)
+
+        def check_wumpus(self, current_node):
+            if current_node.right != 'Wall':
+                if self.KB.check(['~W'+str(current_node.right)]) and self.KB.check(['~S'+current_node.name]):
+                    self.move.append(('Right',Action.SHOOT))
+            if current_node.up != 'Wall':
+                if self.KB.check(['~W'+str(current_node.up)]) and self.KB.check(['~S'+current_node.name]):
+                    self.move.append(('Up',Action.SHOOT))
+            if current_node.left != 'Wall':
+                if self.KB.check(['~W'+str(current_node.left)]) and self.KB.check(['~S'+current_node.name]):
+                    self.move.append(('Left',Action.SHOOT))
+            if current_node.down != 'Wall':
+                if self.KB.check(['~W'+str(current_node.down)]) and self.KB.check(['~S'+current_node.name]):
+                    self.move.append(('Down',Action.SHOOT))
+
+        def getKB(self):
+            return self.KB.KB
