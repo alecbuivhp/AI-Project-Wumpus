@@ -2,7 +2,7 @@ class Tile:
     def __init__(self):
         """Initialize an empty tile"""
         self.__isPit = False
-        self.__numBreeze = 0
+        self.__isBreeze = False
         self.__isWumpus = False
         self.__numStench = 0
         self.__isGold = False
@@ -13,7 +13,7 @@ class Tile:
         return self.__isPit
 
     def getBreeze(self):
-        return False if self.__numBreeze == 0 else True
+        return self.__isBreeze
 
     def getWumpus(self):
         return self.__isWumpus
@@ -32,7 +32,7 @@ class Tile:
         self.__isPit = True
 
     def setBreeze(self):
-        self.__numBreeze += 1
+        self.__isBreeze = True
     
     def setWumpus(self):
         self.__isWumpus = True
@@ -65,9 +65,8 @@ class Tile:
         string = ''
         if self.__isPit:
             string += 'P'
-        if self.__numBreeze != 0:
-            for i in range(self.__numBreeze):
-                string += 'B'
+        if self.__isBreeze:
+            string += 'B'
         if self.__isWumpus:
             string += 'W'
         if self.__numStench != 0:
