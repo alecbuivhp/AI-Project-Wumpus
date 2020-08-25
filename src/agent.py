@@ -4,9 +4,9 @@ from src.bind import *
 from src.world import *
 
 class Agent:
-    def __init__(self ,state, direction):
+    def __init__(self ,state):
         self.current_state = state
-        self.current_direction = direction
+        self.current_direction = Action.RIGHT
         self.has_gold = 0
         self.has_killed_wumpus = 0
         self.is_leaving = False
@@ -49,6 +49,9 @@ class Level_solver(Agent):
         self.start_stench = False
 
         def getAction(self,current_tile):
+            if self.move:
+                return self.move.pop()
+
             current_node = self.state.state[self.agent.current_state]
             if current_node.name == starting_node and current_node.getStench() and not current_node.getBreeze():
                 self.start_stench = True
@@ -73,6 +76,15 @@ class Level_solver(Agent):
                 self.start_stench = False
                 self.clearKB()
 
+            if current_node.name == starting_node and current_node.getBreeze():
+                self.move.append(Action.CLIMB)
+
+
+
+
+
+
+
         def clearKB(self):
             remove = []
             for item in self.KB.KB:
@@ -80,7 +92,6 @@ class Level_solver(Agent):
                     remove.append(item)
             for item in remove:
                 self.KB.KB.remove(item)
-
 
         def handle_breeze(self,current_node):
             sentence = []
