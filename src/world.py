@@ -1,4 +1,5 @@
 import tile
+from random import randrange
 
 class WumpusWorld:
     def __init__(self):
@@ -65,8 +66,49 @@ class WumpusWorld:
         except IOError:
             return None
 
-    def generate_Map(self, numPit, numWumpus, numGold):
-        pass
+    def generate_Map(self, agentPos, numPit, numWumpus, numGold, mapHeight, mapWidth):
+        """Generate random map: A pit, wumpus or gold will not exist at the same tile also they are not at the door"""
+        self.height = mapHeight
+        self.width = mapWidth
+
+        for i in range(self.height):
+            tile_line = []
+            for j in range(self.width):
+                tile_line.append(tile.Tile())
+            self.listTiles.append(tile_line)
+
+        self.doorPos = agentPos
+        self.listTiles[agentPos[0]][agentPos[1]].setPlayer()
+
+        self.__numGold = numGold
+        for i in range(self.__numGold):
+            while True:
+                randomPos = (randrange(self.height), randrange(self.width))
+                if not randomPos == self.doorPos and not self.listTiles[randomPos[0]][randomPos[1]].getPit() and not self.listTiles[randomPos[0]][randomPos[1]].getWumpus() and not self.listTiles[randomPos[0]][randomPos[1]].getGold():
+                    self.listTiles[randomPos[0]][randomPos[1]].setGold()
+                    break
+                    
+        for i in range(numPit):
+            while True:
+                randomPos = (randrange(self.height), randrange(self.width))
+                if not randomPos == self.doorPos and not self.listTiles[randomPos[0]][randomPos[1]].getPit() and not self.listTiles[randomPos[0]][randomPos[1]].getWumpus() and not self.listTiles[randomPos[0]][randomPos[1]].getGold():
+                    self.listTiles[randomPos[0]][randomPos[1]].setPit()
+                    adj = self.get_Adjacents(randomPos[0], randomPos[1])
+                    for a in adj:
+                        (self.listTiles[a[0]][a[1]]).setBreeze()
+                    break
+
+        
+        self.__numWumpus = numWumpus
+        for i in range(self.__numWumpus):
+            while True:
+                randomPos = (randrange(self.height), randrange(self.width))
+                if not self.listTiles[randomPos[0]][randomPos[1]].getPit() and not self.listTiles[randomPos[0]][randomPos[1]].getWumpus() and not self.listTiles[randomPos[0]][randomPos[1]].getGold():
+                    self.listTiles[randomPos[0]][randomPos[1]].setWumpus()
+                    adj = self.get_Adjacents(randomPos[0], randomPos[1])
+                    for a in adj:
+                        (self.listTiles[a[0]][a[1]]).setStench()
+                    break
 
     def grabGold(self, i , j):
         self.__numGold -= 1

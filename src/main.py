@@ -237,7 +237,13 @@ class Board:
 
             self.canvas.delete(self.tiles[self.agentPos[0]][self.agentPos[1]])
             self.tiles[self.agentPos[0]][self.agentPos[1]] = self.canvas.create_image(64 * self.agentPos[1], 64 * self.agentPos[0], image=self.TILE, anchor=NW)
-            
+
+                # Overlapping handle            
+            if self.warnings[self.agentPos[0]][self.agentPos[1]]:
+                if (self.warnings[self.agentPos[0]][self.agentPos[1]])[0]:
+                    self.canvas.tag_raise(self.warnings[self.agentPos[0]][self.agentPos[1]][0], self.tiles[self.agentPos[0]][self.agentPos[1]])
+                if (self.warnings[self.agentPos[0]][self.agentPos[1]])[1]:
+                    self.canvas.tag_raise(self.warnings[self.agentPos[0]][self.agentPos[1]][1], self.tiles[self.agentPos[0]][self.agentPos[1]])
             self.canvas.tag_raise(self.player, self.tiles[self.agentPos[0]][self.agentPos[1]])
 
             # END GAME ?
@@ -318,6 +324,7 @@ class Board:
 
 wumpus_world = world.WumpusWorld()
 wumpus_world.read_Map('map\original.txt')
+# wumpus_world.generate_Map((0, 0), 10, 10, 10, 10, 10)
 
 board = Board(wumpus_world)
 board.createWorld()
