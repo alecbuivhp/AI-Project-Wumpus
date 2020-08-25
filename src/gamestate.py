@@ -1,7 +1,11 @@
-from src import world
-from src.tile import *
-class Node(Tile):
-    def __init__(self,row,col,world):
+import world
+# import tile
+
+#from src import world
+#from src.tile import *
+
+class Node():
+    def __init__(self, row, col, world):
         # self.row = row
         # self.col = col
         self.name = str(row) + ',' + str(col)

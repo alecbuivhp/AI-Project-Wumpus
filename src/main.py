@@ -3,10 +3,10 @@ from tkinter import *
 from tkinter import font
 import time
 
-import gamestate
-import agent
+# Propositional logic agent 
+import gamestate, agent
 
-DELAY = 100
+DELAY = 1500
 
 class Board:
     def __init__(self, world):
@@ -15,8 +15,8 @@ class Board:
 
         self.canvas = Canvas(self.root, width=64 * world.width, height=64 * world.height + 64, background='white')
         self.canvas.pack()
-
-        # self.root.bind("<Key>", self.updateBoard)
+        
+        # self.root.bind("<Key>", self.updateBoard) # Manual agent
 
         self.world = world
 
@@ -52,7 +52,7 @@ class Board:
 
         # Agent
         # self.agent = controller.ManualAgent()
-        self.agent = None
+        self.agent = None # PL agent
 
         self.agentPos = None
 
@@ -123,8 +123,8 @@ class Board:
                     terrains_line.append(self.canvas.create_image(64 * j, 64 * i, image=self.TERRAIN, anchor=NW))
             self.terrains.append(terrains_line)
 
-        # Test Duck code
-        starting_node = gamestate.Node(self.agentPos[0], self.agentPos[1])
+        # Init PL agent
+        starting_node = gamestate.Node(self.agentPos[0], self.agentPos[1], self.world)
         self.agent = agent.Level_solver(self.world, starting_node)
 
         #self.world.printWorld()
@@ -281,7 +281,7 @@ class Board:
         self.canvas.create_image((64 * self.world.width) // 2 - 70, ((64 * self.world.height) // 2) + 64 + 30, image=self.SCORE, anchor=NW)
         self.canvas.create_text((64 * self.world.width) // 2, ((64 * self.world.height) // 2) + 124 - 30, fill='#ffff00', font=self.scoreFont, text=str(self.score), anchor=NW)
 
-        # self.root.unbind("<Key>")
+        self.root.unbind("<Key>")
         
         self.gameState = bind.GameState.NOT_RUNNING
 
@@ -324,12 +324,16 @@ class Board:
                 self.score += 10
                 self.endGame("Climb")
 
-    ############################# AI ACTION AND UPDATE GAME #############################
+    ############################# MAIN LOOP #############################
+        # Manual agent's
+    # def mainloop(self):
+    #     self.root.mainloop()
 
-    def runBoard(self):
+        # PL agent's
+    def mainloop(self):
         self.gameState = bind.GameState.RUNNING
 
-        while self.GameState == bind.GameState.RUNNING:
+        while self.gameState == bind.GameState.RUNNING:
             action = self.agent.getAction()
 
             if action == bind.Action.DOWN:
@@ -364,15 +368,11 @@ class Board:
                 if self.agentPos == self.world.doorPos:
                     self.score += 10
                     self.endGame("Climb")
+
+            self.root.update()
+            self.root.after(DELAY)
             # self.world.printWorld()
 
-
-    
-        
-    ############################# MAIN LOOP #############################
-
-    def mainloop(self):
-        self.runBoard()
         self.root.mainloop()
 
 ##########################################################################################################
