@@ -10,7 +10,5 @@ class Action(enum.Enum):
     CLIMB   = 7
 
 class GameState(enum.Enum):
-    NOT_STARTED = 1
-    RUNNING     = 2 
-    WIN         = 3
-    GAME_OVER   = 4
+    RUNNING     = 1
+    NOT_RUNNING = 2 

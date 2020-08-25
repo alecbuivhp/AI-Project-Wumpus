@@ -3,6 +3,9 @@ from tkinter import *
 from tkinter import font
 import time
 
+import gamestate
+import agent
+
 DELAY = 100
 
 class Board:
@@ -13,7 +16,7 @@ class Board:
         self.canvas = Canvas(self.root, width=64 * world.width, height=64 * world.height + 64, background='white')
         self.canvas.pack()
 
-        self.root.bind("<Key>", self.updateBoard)
+        # self.root.bind("<Key>", self.updateBoard)
 
         self.world = world
 
@@ -45,10 +48,12 @@ class Board:
         self.SCORE = PhotoImage(file='assets/score_icon.png')
 
         # Game state
-        self.gameState = bind.GameState.NOT_STARTED
+        self.gameState = bind.GameState.NOT_RUNNING
 
         # Agent
-        self.agent = controller.ManualAgent()
+        # self.agent = controller.ManualAgent()
+        self.agent = None
+
         self.agentPos = None
 
         # Score
@@ -117,6 +122,10 @@ class Board:
                 else:
                     terrains_line.append(self.canvas.create_image(64 * j, 64 * i, image=self.TERRAIN, anchor=NW))
             self.terrains.append(terrains_line)
+
+        # Test Duck code
+        starting_node = gamestate.Node(self.agentPos[0], self.agentPos[1])
+        self.agent = agent.Level_solver(self.world, starting_node)
 
         #self.world.printWorld()
 
@@ -272,7 +281,9 @@ class Board:
         self.canvas.create_image((64 * self.world.width) // 2 - 70, ((64 * self.world.height) // 2) + 64 + 30, image=self.SCORE, anchor=NW)
         self.canvas.create_text((64 * self.world.width) // 2, ((64 * self.world.height) // 2) + 124 - 30, fill='#ffff00', font=self.scoreFont, text=str(self.score), anchor=NW)
 
-        self.root.unbind("<Key>")
+        # self.root.unbind("<Key>")
+        
+        self.gameState = bind.GameState.NOT_RUNNING
 
     ############################# INPUT AND UPDATE GAME #############################
 
@@ -313,11 +324,55 @@ class Board:
                 self.score += 10
                 self.endGame("Climb")
 
-        # self.world.printWorld()
+    ############################# AI ACTION AND UPDATE GAME #############################
+
+    def runBoard(self):
+        self.gameState = bind.GameState.RUNNING
+
+        while self.GameState == bind.GameState.RUNNING:
+            action = self.agent.getAction()
+
+            if action == bind.Action.DOWN:
+                if action == self.agent.currentState:
+                    self.moveForward(action)
+                else:
+                    self.canvas.itemconfigure(self.player, image=self.PLAYER_DOWN)
+                    self.agent.currentState = bind.Action.DOWN
+            elif action == bind.Action.UP:
+                if action == self.agent.currentState:
+                    self.moveForward(action)
+                else:
+                    self.canvas.itemconfigure(self.player, image=self.PLAYER_UP)
+                    self.agent.currentState = bind.Action.UP
+            elif action == bind.Action.LEFT:
+                if action == self.agent.currentState:
+                    self.moveForward(action)
+                else:
+                    self.canvas.itemconfigure(self.player, image=self.PLAYER_LEFT)
+                    self.agent.currentState = bind.Action.LEFT
+            elif action == bind.Action.RIGHT:
+                if action == self.agent.currentState:
+                    self.moveForward(action)
+                else:
+                    self.canvas.itemconfigure(self.player, image=self.PLAYER_RIGHT)
+                    self.agent.currentState = bind.Action.RIGHT
+            elif action == bind.Action.SHOOT:
+                self.shootForward(self.agent.currentState)
+            elif action == bind.Action.GRAB:
+                self.grabGold()
+            elif action == bind.Action.CLIMB:
+                if self.agentPos == self.world.doorPos:
+                    self.score += 10
+                    self.endGame("Climb")
+            # self.world.printWorld()
+
+
+    
         
     ############################# MAIN LOOP #############################
 
     def mainloop(self):
+        self.runBoard()
         self.root.mainloop()
 
 ##########################################################################################################
