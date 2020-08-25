@@ -58,3 +58,24 @@ class Tile:
     
     def removePlayer(self):
         self.__isPlayer = False
+
+    ################################# DEBUGGING #################################
+    
+    def printTile(self):
+        string = ''
+        if self.__isPit:
+            string += 'P'
+        if self.__numBreeze != 0:
+            for i in range(self.__numBreeze):
+                string += 'B'
+        if self.__isWumpus:
+            string += 'W'
+        if self.__numStrench != 0:
+            for i in range(self.__numStrench):
+                string += 'S'
+        if self.__isGold:
+            string += 'G'
+        if self.__isPlayer:
+            string += 'A'
+
+        return string
