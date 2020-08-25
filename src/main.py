@@ -96,11 +96,11 @@ class Board:
                     warning_at_loc.append(self.canvas.create_text(64 * j + 3, 64 * i, fill='white', font=warningFont, text='Breeze', anchor=NW))
                 else:
                     warning_at_loc.append(None)
-                if tile_at_loc.getStrench():
-                    warning_at_loc.append(self.canvas.create_text(64 * j + 3, (64 * i) + 50, fill='white', font=warningFont, text='Strench', anchor=NW))
+                if tile_at_loc.getStench():
+                    warning_at_loc.append(self.canvas.create_text(64 * j + 3, (64 * i) + 50, fill='white', font=warningFont, text='Stench', anchor=NW))
                 else:
                     warning_at_loc.append(None)
-                if not tile_at_loc.getBreeze() and not tile_at_loc.getStrench():
+                if not tile_at_loc.getBreeze() and not tile_at_loc.getStench():
                     warnings_line.append(None)
                 else:
                     warnings_line.append(warning_at_loc)

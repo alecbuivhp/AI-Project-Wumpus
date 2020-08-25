@@ -4,7 +4,7 @@ class Tile:
         self.__isPit = False
         self.__numBreeze = 0
         self.__isWumpus = False
-        self.__numStrench = 0
+        self.__numStench = 0
         self.__isGold = False
         self.__isPlayer = False
 
@@ -18,8 +18,8 @@ class Tile:
     def getWumpus(self):
         return self.__isWumpus
 
-    def getStrench(self):
-        return False if self.__numStrench == 0 else True
+    def getStench(self):
+        return False if self.__numStench == 0 else True
         
     def getGold(self):
         return self.__isGold
@@ -37,8 +37,8 @@ class Tile:
     def setWumpus(self):
         self.__isWumpus = True
 
-    def setStrench(self):
-        self.__numStrench += 1
+    def setStench(self):
+        self.__numStench += 1
 
     def setGold(self):
         self.__isGold = True
@@ -50,8 +50,8 @@ class Tile:
     def removeWumpus(self):
         self.__isWumpus = False
 
-    def removeStrench(self):
-        self.__numStrench -= 1
+    def removeStench(self):
+        self.__numStench -= 1
 
     def removeGold(self):
         self.__isGold = False
@@ -70,8 +70,8 @@ class Tile:
                 string += 'B'
         if self.__isWumpus:
             string += 'W'
-        if self.__numStrench != 0:
-            for i in range(self.__numStrench):
+        if self.__numStench != 0:
+            for i in range(self.__numStench):
                 string += 'S'
         if self.__isGold:
             string += 'G'
