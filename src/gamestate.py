@@ -1,3 +1,4 @@
+from src import world
 class Node:
     def __init__(self,row,col):
         self.row = row
@@ -11,12 +12,11 @@ class Node:
 
 
 class GameState:
-    def __init__(self,max_row,max_col):
+    def __init__(self,world):
         self.visited = []
         self.unvisited = []
         self.state = dict()
-        self.max_row = max_row
-        self.max_col = max_col
+        self.max_row,self.max_col = world.getSizeMap()
 
     def add_state(self,node):
         #FIX ME LATER
