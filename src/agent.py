@@ -61,7 +61,9 @@ class Level_solver(Agent):
     def getAction(self):
         current_node = self.state.state[self.agent.current_state]
         tile_at_loc = self.world.listTiles[current_node.row][current_node.col]
-        self.world.printWorld()
+        print("visited = " ,self.state.visited)
+        print("unvisited = ", self.state.unvisited_safe)
+        print("current_node =", self.agent.current_state)
         if not tile_at_loc.getStench() and current_node.name == self.starting_node.name:
             self.move = []
             self.start_stench = False
@@ -89,10 +91,14 @@ class Level_solver(Agent):
                 if adjecent == 'Wall':
                     continue
                 self.KB.add(['W' + str(adjecent[0]) + ',' + str(adjecent[1])])
-            self.move.append(('Right', bind.Action.SHOOT))
-            self.move.append(('Up', bind.Action.SHOOT))
-            self.move.append(('Left', bind.Action.SHOOT))
-            self.move.append(('Down', bind.Action.SHOOT))
+            self.move.append(bind.Action.RIGHT)
+            self.move.append(bind.Action.SHOOT)
+            self.move.append(bind.Action.UP)
+            self.move.append(bind.Action.SHOOT)
+            self.move.append(bind.Action.LEFT)
+            self.move.append(bind.Action.SHOOT)
+            self.move.append(bind.Action.DOWN)
+            self.move.append(bind.Action.SHOOT)
         if current_node.name == self.starting_node.name and tile_at_loc.getBreeze():
             self.move.append(bind.Action.CLIMB)
         if not self.exit and not self.killing_wumpus:
@@ -106,7 +112,7 @@ class Level_solver(Agent):
             elif not tile_at_loc.getBreeze():
                 self.handle_no_breeze(current_node)
             self.check_safe(current_node)
-            if not self.killing_wumpus and current_node.name == self.starting_node.name:
+            if not self.killing_wumpus:
                 if len(self.state.unvisited_safe) > 0:
                     search = Search(self.state.state, self.agent.current_state,self.state.unvisited_safe, self.state.visited,self.agent.current_direction)
                     cost_path = search.unicost()
@@ -268,13 +274,13 @@ class Level_solver(Agent):
         direction = self.agent.current_direction
         state = self.agent.current_state
         current_node = self.state.state[state]
-        # self.agent.move_foward(self.state.state)
         move_list = []
         for item in path:
             row, col = item.split(',')
             new_state = gamestate.Node(int(row), int(col), self.world)
             self.state.add_state(new_state)
-
+            if item in self.state.unvisited_safe and item in self.state.visited:
+                self.state.unvisited_safe.remove(item)
             if direction.name == "RIGHT":
                 if item == current_node.right:
                     move_list.append(bind.Action.RIGHT)
@@ -313,7 +319,6 @@ class Level_solver(Agent):
                     move_list.append(bind.Action.LEFT)
                     direction = bind.Action.LEFT
                     current_node = self.state.state[current_node.left]
-
             elif direction.name == "LEFT":
                 if item == current_node.right:
                     move_list.append(bind.Action.RIGHT)
@@ -352,9 +357,10 @@ class Level_solver(Agent):
                     move_list.append(bind.Action.LEFT)
                     direction = bind.Action.LEFT
                     current_node = self.state.state[current_node.left]
-
-
+        if self.agent.current_direction != move_list[0]:
+            self.agent.current_direction = move_list[0]
+        self.agent.move_foward(self.state.state)
         if self.exit:
             move_list.append(bind.Action.CLIMB)
-
         return move_list
+##########################################

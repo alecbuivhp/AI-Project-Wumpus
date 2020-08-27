@@ -62,7 +62,7 @@ class Search:
                             cost = self.movement_cost_str(current[1], 'DOWN') + current[0]
                             heapq.heappush(frontier,(cost, 'DOWN', self.graph[current[2]].down, path))
 
-            return [expansion[-1][0], expansion[-1][3][1:]]
+            return expansion[-1][3][0:]
 
 
     def movement_cost(self, current, next):
