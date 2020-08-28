@@ -73,25 +73,6 @@ class Level_solver(Agent):
         print("visited = " ,self.state.visited)
         print("unvisited = ", self.state.unvisited_safe)
         print("current_node =", self.agent.current_state)
-        # self.world.printWorld()
-        if not tile_at_loc.getStench() and current_node.name == self.starting_node.name:
-            self.start_stench = False
-            self.clearKB()
-            self.killing_wumpus = False
-            for item in self.KB.KB:
-                if item[0][0] == "S":
-                    name = item[0][1:]
-                    breeze_check = "~B" + item[0][1:]
-                    node = self.state.state[name]
-                    if not self.KB.check([breeze_check]):
-                        if node.right not in self.state.visited and node.right not in self.state.unvisited_safe and node.right != 'Wall':
-                            self.state.unvisited_safe.append(node.right)
-                        if node.up not in self.state.visited and node.up not in self.state.unvisited_safe and node.up != 'Wall':
-                            self.state.unvisited_safe.append(node.up)
-                        if node.left not in self.state.visited and node.left not in self.state.unvisited_safe and node.left != 'Wall':
-                            self.state.unvisited_safe.append(node.left)
-                        if node.down not in self.state.visited and node.down not in self.state.unvisited_safe and node.down != 'Wall':
-                            self.state.unvisited_safe.append(node.down)
 
         if current_node.name == self.starting_node.name and tile_at_loc.getStench() and not tile_at_loc.getBreeze():
             self.start_stench = True
@@ -114,7 +95,8 @@ class Level_solver(Agent):
         if not self.exit and not self.killing_wumpus:
             if tile_at_loc.getStench():
                 self.handle_stench(current_node)
-                self.check_wumpus(current_node)
+                # self.check_wumpus(current_node)
+                # return bind.Action.SHOOT
             elif not tile_at_loc.getStench():
                 self.handle_no_stench(current_node)
             if tile_at_loc.getBreeze():
@@ -187,7 +169,6 @@ class Level_solver(Agent):
             self.KB.add([prefix + current_node.left])
         if current_node.down not in self.state.visited and current_node.down != 'Wall':
             self.KB.add([prefix + current_node.down])
-        self.KB.add(["~S" + current_node.name])
 
     def handle_no_breeze(self,current_node):
         prefix = '~P'
@@ -199,7 +180,6 @@ class Level_solver(Agent):
             self.KB.add([prefix + current_node.left])
         if current_node.down not in self.state.visited and current_node.down != 'Wall':
             self.KB.add([prefix + current_node.down])
-        self.KB.add(["~B" + current_node.name])
 #####################################
 
     def check_safe(self, current_node):
@@ -233,9 +213,8 @@ class Level_solver(Agent):
             if (self.KB.check(["W" + str(row) + "," + str(col - 1)]) and self.KB.check(["~S" + str(row - 1) + "," + str(col - 1)])) or (self.KB.check(["W" + str(row) + "," + str(col + 1)]) and self.KB.check(["~S" + str(row - 1) + "," + str(col + 1)])):
                 self.kill_wumpus("Down")
 
-
     def kill_wumpus(self, direction):
-        # self.killing_wumpus = True
+        self.killing_wumpus = True
         self.move = []
         if direction == 'Right':
             if self.agent.current_direction == bind.Action.RIGHT:
