@@ -100,15 +100,15 @@ class Level_solver(Agent):
             #     if adjecent == 'Wall':
             #         continue
             #     self.KB.add(['W' + str(adjecent[0]) + ',' + str(adjecent[1])])
-            self.handle_stench(current_node)
-            self.move.append(bind.Action.RIGHT)
-            self.move.append(bind.Action.SHOOT)
-            self.move.append(bind.Action.UP)
-            self.move.append(bind.Action.SHOOT)
-            self.move.append(bind.Action.LEFT)
-            self.move.append(bind.Action.SHOOT)
-            self.move.append(bind.Action.DOWN)
-            self.move.append(bind.Action.SHOOT)
+            #
+            # self.move.append(bind.Action.RIGHT)
+            # self.move.append(bind.Action.SHOOT)
+            # self.move.append(bind.Action.UP)
+            # self.move.append(bind.Action.SHOOT)
+            # self.move.append(bind.Action.LEFT)
+            # self.move.append(bind.Action.SHOOT)
+            # self.move.append(bind.Action.DOWN)
+            # self.move.append(bind.Action.SHOOT)
         if current_node.name == self.starting_node.name and tile_at_loc.getBreeze():
             self.move.append(bind.Action.CLIMB)
         if not self.exit and not self.killing_wumpus:
@@ -122,6 +122,8 @@ class Level_solver(Agent):
             elif not tile_at_loc.getBreeze():
                 self.handle_no_breeze(current_node)
             self.check_safe(current_node)
+            if tile_at_loc.getGold():
+                return bind.Action.GRAB
             if not self.killing_wumpus:
                 if len(self.state.unvisited_safe) > 0:
                     search = Search(self.state.state, self.agent.current_state,self.state.unvisited_safe[-1:], self.state.visited,self.agent.current_direction)
@@ -133,7 +135,6 @@ class Level_solver(Agent):
                     cost_path = search.unicost()
                     self.move = self.move_list(cost_path)
         if self.move:
-
             move = self.move.pop(0)
             return move
 
@@ -186,6 +187,7 @@ class Level_solver(Agent):
             self.KB.add([prefix + current_node.left])
         if current_node.down not in self.state.visited and current_node.down != 'Wall':
             self.KB.add([prefix + current_node.down])
+        self.KB.add(["~S" + current_node.name])
 
     def handle_no_breeze(self,current_node):
         prefix = '~P'
@@ -197,6 +199,7 @@ class Level_solver(Agent):
             self.KB.add([prefix + current_node.left])
         if current_node.down not in self.state.visited and current_node.down != 'Wall':
             self.KB.add([prefix + current_node.down])
+        self.KB.add(["~B" + current_node.name])
 #####################################
 
     def check_safe(self, current_node):
@@ -215,44 +218,47 @@ class Level_solver(Agent):
                 self.state.unvisited_safe.append(current_node.down)
 #####################################
     def check_wumpus(self, current_node):
-        if current_node.right != 'Wall':
-            if self.KB.check(['~W'+str(current_node.right)]) and self.KB.check(['~S'+current_node.name]):
-                self.kill_wumpus('Right')
-        if current_node.up != 'Wall':
-            if self.KB.check(['~W'+str(current_node.up)]) and self.KB.check(['~S'+current_node.name]):
-                self.kill_wumpus('Up')
-        if current_node.left != 'Wall':
-            if self.KB.check(['~W'+str(current_node.left)]) and self.KB.check(['~S'+current_node.name]):
-                self.kill_wumpus('Left')
-        if current_node.down != 'Wall':
-            if self.KB.check(['~W'+str(current_node.down)]) and self.KB.check(['~S'+current_node.name]):
-                self.kill_wumpus('Down')
+        row = current_node.row
+        col = current_node.col
+        if current_node.right != "Wall":
+            if (self.KB.check(["W" + str(row - 1) + "," + str(col)]) and self.KB.check(["S" + str(row - 1) + "," + str(col - 1)])) or (self.KB.check(["W" + str(row + 1) + "," + str(col)]) and self.KB.check(["S" + str(row + 1) + "," + str(col - 1)])):
+                self.kill_wumpus("Right")
+        if current_node.up != "Wall":
+            if (self.KB.check(["W" + str(row) + "," + str(col - 1)]) and self.KB.check(["~S" + str(row + 1) + "," + str(col - 1)])) or (self.KB.check(["W" + str(row) + "," + str(col + 1)]) and self.KB.check(["~S" + str(row + 1) + "," + str(col + 1)])):
+                self.kill_wumpus("Up")
+        if current_node.left != "Wall":
+            if (self.KB.check(["W" + str(row - 1) + "," + str(col)]) and self.KB.check(["~S" + str(row - 1) + "," + str(col - 1)])) or (self.KB.check(["W" + str(row + 1) + "," + str(col)]) and self.KB.check(["~S" + str(row + 1) + "," + str(col - 1)])):
+                self.kill_wumpus("Left")
+        if current_node.down != "Wall":
+            if (self.KB.check(["W" + str(row) + "," + str(col - 1)]) and self.KB.check(["~S" + str(row - 1) + "," + str(col - 1)])) or (self.KB.check(["W" + str(row) + "," + str(col + 1)]) and self.KB.check(["~S" + str(row - 1) + "," + str(col + 1)])):
+                self.kill_wumpus("Down")
+
 
     def kill_wumpus(self, direction):
-        self.killing_wumpus = True
+        # self.killing_wumpus = True
         self.move = []
         if direction == 'Right':
-            if self.agent.current_direction == 'Right':
+            if self.agent.current_direction == bind.Action.RIGHT:
                 self.move.insert(0, bind.Action.SHOOT)
-            elif self.agent.current_direction != 'Right':
+            elif self.agent.current_direction != bind.Action.RIGHT:
                 self.move.insert(0, bind.Action.SHOOT)
                 self.move.insert(0, bind.Action.RIGHT)
         elif direction == 'Up':
-            if self.agent.current_direction == 'Up':
+            if self.agent.current_direction == bind.Action.UP:
                 self.move.insert(0, bind.Action.SHOOT)
-            elif self.agent.current_direction != 'Up':
+            elif self.agent.current_direction != bind.Action.UP:
                 self.move.insert(0, bind.Action.SHOOT)
                 self.move.insert(0, bind.Action.UP)
         elif direction == 'Left':
-            if self.agent.current_direction == "Left":
+            if self.agent.current_direction == bind.Action.LEFT:
                 self.move.insert(0, bind.Action.SHOOT)
-            elif self.agent.current_direction != 'Left':
+            elif self.agent.current_direction != bind.Action.LEFT:
                 self.move.insert(0, bind.Action.SHOOT)
                 self.move.insert(0, bind.Action.LEFT)
         elif direction == 'Down':
-            if self.agent.current_direction == 'Down':
+            if self.agent.current_direction == bind.Action.DOWN:
                 self.move.insert(0, bind.Action.SHOOT)
-            elif self.agent.current_direction != 'Down':
+            elif self.agent.current_direction != bind.Action.DOWN:
                 self.move.insert(0, bind.Action.SHOOT)
                 self.move.insert(0, bind.Action.DOWN)
 ######################################
