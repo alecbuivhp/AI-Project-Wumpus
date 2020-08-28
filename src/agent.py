@@ -27,17 +27,24 @@ class Agent:
         elif self.current_direction == bind.Action.DOWN and state[self.current_state].down != 'Wall':
             self.current_state = state[self.current_state].down
 
+    def move(self,Node, world):
+        row, col = Node.split(',')
+        new_state = gamestate.Node(int(row), int(col), world)
+        self.current_state.add_state(new_state)
+        self.current_state = self.current_state[Node]
+
+
     def turn_left(self):
-        self.current_direction = "Left"
+        self.current_direction = bind.Action.LEFT
 
     def turn_right(self):
-        self.current_direction = "Right"
+        self.current_direction = bind.Action.RIGHT
 
     def turn_up(self):
-        self.current_direction = "Up"
+        self.current_direction = bind.Action.UP
 
     def turn_down(self):
-        self.current_direction = "Down"
+        self.current_direction = bind.Action.DOWN
 
 
 class Level_solver(Agent):
@@ -61,11 +68,13 @@ class Level_solver(Agent):
     def getAction(self):
         current_node = self.state.state[self.agent.current_state]
         tile_at_loc = self.world.listTiles[current_node.row][current_node.col]
+        if current_node.name in self.state.unvisited_safe:
+            self.state.unvisited_safe.remove(current_node.name)
         print("visited = " ,self.state.visited)
         print("unvisited = ", self.state.unvisited_safe)
         print("current_node =", self.agent.current_state)
+        # self.world.printWorld()
         if not tile_at_loc.getStench() and current_node.name == self.starting_node.name:
-            self.move = []
             self.start_stench = False
             self.clearKB()
             self.killing_wumpus = False
@@ -86,11 +95,12 @@ class Level_solver(Agent):
 
         if current_node.name == self.starting_node.name and tile_at_loc.getStench() and not tile_at_loc.getBreeze():
             self.start_stench = True
-            sentence = self.world.get_Adjacents(current_node.row, current_node.col)
-            for adjecent in sentence:
-                if adjecent == 'Wall':
-                    continue
-                self.KB.add(['W' + str(adjecent[0]) + ',' + str(adjecent[1])])
+            # sentence = self.world.get_Adjacents(current_node.row, current_node.col)
+            # for adjecent in sentence:
+            #     if adjecent == 'Wall':
+            #         continue
+            #     self.KB.add(['W' + str(adjecent[0]) + ',' + str(adjecent[1])])
+            self.handle_stench(current_node)
             self.move.append(bind.Action.RIGHT)
             self.move.append(bind.Action.SHOOT)
             self.move.append(bind.Action.UP)
@@ -114,7 +124,7 @@ class Level_solver(Agent):
             self.check_safe(current_node)
             if not self.killing_wumpus:
                 if len(self.state.unvisited_safe) > 0:
-                    search = Search(self.state.state, self.agent.current_state,self.state.unvisited_safe, self.state.visited,self.agent.current_direction)
+                    search = Search(self.state.state, self.agent.current_state,self.state.unvisited_safe[-1:], self.state.visited,self.agent.current_direction)
                     cost_path = search.unicost()
                     self.move = self.move_list(cost_path)
                 else:
@@ -123,34 +133,10 @@ class Level_solver(Agent):
                     cost_path = search.unicost()
                     self.move = self.move_list(cost_path)
         if self.move:
+
             move = self.move.pop(0)
             return move
 
-
-
-
-    def handle_direction_action(self,direction,action,move):
-        if direction == 'Right' and self.agent.current_direction == bind.Action.RIGHT:
-            move.insert(0,action)
-        elif direction == 'Right' and self.agent.current_direction != bind.Action.RIGHT:
-            move.insert(0,action)
-            move.insert(0, bind.Action.RIGHT)
-        if direction == 'Up' and self.agent.current_direction == bind.Action.UP:
-            move.insert(0,action)
-        elif direction == 'Up' and self.agent.current_direction != bind.Action.UP:
-            move.insert(0, action)
-            move.insert(0, bind.Action.UP)
-        if direction == 'Left' and self.agent.current_direction == bind.Action.LEFT:
-            move.insert(0,action)
-        elif direction == 'Left' and self.agent.current_direction != bind.Action.LEFT:
-            move.insert(0, action)
-            move.insert(0, bind.Action.LEFT)
-        if direction == 'Down' and self.agent.current_direction == bind.Action.DOWN:
-            move.insert(0,action)
-        elif direction == 'Down' and self.agent.current_direction != bind.Action.DOWN:
-            move.insert(0, action)
-            move.insert(0, bind.Action.DOWN)
-        return move.pop
 
     def clearKB(self):
         remove = []
@@ -279,9 +265,9 @@ class Level_solver(Agent):
             row, col = item.split(',')
             new_state = gamestate.Node(int(row), int(col), self.world)
             self.state.add_state(new_state)
-            if item in self.state.unvisited_safe and item in self.state.visited:
-                self.state.unvisited_safe.remove(item)
-            if direction.name == "RIGHT":
+            # if item in self.state.unvisited_safe and item in self.state.visited:
+            #     self.state.unvisited_safe.remove(item)
+            if str(direction.name) == str(bind.Action.RIGHT.name):
                 if item == current_node.right:
                     move_list.append(bind.Action.RIGHT)
                     current_node = self.state.state[current_node.right]
@@ -300,7 +286,7 @@ class Level_solver(Agent):
                     move_list.append(bind.Action.LEFT)
                     direction = bind.Action.LEFT
                     current_node = self.state.state[current_node.left]
-            elif direction.name == "UP":
+            elif str(direction.name) == str(bind.Action.UP.name):
                 if item == current_node.right:
                     move_list.append(bind.Action.RIGHT)
                     move_list.append(bind.Action.RIGHT)
@@ -319,7 +305,7 @@ class Level_solver(Agent):
                     move_list.append(bind.Action.LEFT)
                     direction = bind.Action.LEFT
                     current_node = self.state.state[current_node.left]
-            elif direction.name == "LEFT":
+            elif str(direction.name) == str(bind.Action.LEFT.name):
                 if item == current_node.right:
                     move_list.append(bind.Action.RIGHT)
                     move_list.append(bind.Action.RIGHT)
@@ -338,7 +324,7 @@ class Level_solver(Agent):
                 elif item == current_node.left:
                     move_list.append(bind.Action.LEFT)
                     current_node = self.state.state[current_node.left]
-            elif direction == "DOWN":
+            elif str(direction.name) == str(bind.Action.DOWN.name):
                 if item == current_node.right:
                     move_list.append(bind.Action.RIGHT)
                     move_list.append(bind.Action.RIGHT)
@@ -357,10 +343,16 @@ class Level_solver(Agent):
                     move_list.append(bind.Action.LEFT)
                     direction = bind.Action.LEFT
                     current_node = self.state.state[current_node.left]
-        if self.agent.current_direction != move_list[0]:
-            self.agent.current_direction = move_list[0]
-        self.agent.move_foward(self.state.state)
         if self.exit:
             move_list.append(bind.Action.CLIMB)
+        if self.agent.current_direction != move_list[0]:
+            self.agent.current_direction = move_list[0]
+        else:
+            self.agent.move_foward(self.state.state)
         return move_list
 ##########################################
+    def walk(self):
+        self.agent.move_foward(self.state.state)
+        row_col = self.agent.current_state.split(",")
+        state = gamestate.Node(int(row_col[0]), int(row_col[1]),self.world)
+        self.state.add_state(state)
