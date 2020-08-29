@@ -211,6 +211,7 @@ class Board:
 
 
         if self.world.listTiles[arrow_loc[0]][arrow_loc[1]].getWumpus():
+            self.agent.scream = True
             # UPDATE WORLD
             self.world.killWumpus(arrow_loc[0], arrow_loc[1])
 
@@ -230,6 +231,7 @@ class Board:
             # END GAME ?
             if not self.world.leftWumpus() and not self.world.leftGold():
                 self.endGame("Clear")
+
 
 
     def grabGold(self):
@@ -376,9 +378,9 @@ class Board:
         self.root.mainloop()
 
 ##########################################################################################################
-
+#FIX 10G-0P-10W
 wumpus_world = world.WumpusWorld()
-wumpus_world.read_Map('../map/original.txt')
+wumpus_world.read_Map('../map/10G-10P-10W-base.txt')
 # wumpus_world.generate_Map((0, 0), 10, 10, 10, 10, 10)
 
 board = Board(wumpus_world)
