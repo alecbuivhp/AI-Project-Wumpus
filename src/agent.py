@@ -2,7 +2,7 @@ import gamestate
 import kb
 import bind
 import world
-from search import *
+from src.search import *
 
 # from src.gamestate import *
 # from src.kb import *
@@ -84,7 +84,13 @@ class Level_solver(Agent):
             elif self.agent.current_direction == Action.DOWN:
                 self.state.unvisited_safe.append(current_node.down)
         self.scream = False
-
+        for item in self.state.visited[-10:]:
+            row, col = item.split(',')
+            if item == '7,7':
+                i = 1
+            tile = self.world.listTiles[int(row)][int(col)]
+            if not tile.getStench() and self.KB.check(["~S"+str(item)]):
+                self.clear_stench_KB(item)
         if current_node.name == self.starting_node.name and tile_at_loc.getBreeze():
             self.move.append(bind.Action.CLIMB)
         if not self.exit and not self.killing_wumpus:
@@ -117,6 +123,10 @@ class Level_solver(Agent):
                 self.clearKB()
             return move
 
+    def clear_stench_KB(self,node):
+        # for item in self.KB.KB:
+        #     if item == ['S' + str(node)]:
+        self.KB.KB.remove(['S'+node])
 
     def clearKB(self):
         remove = []
@@ -198,21 +208,38 @@ class Level_solver(Agent):
         row = current_node.row
         col = current_node.col
         if current_node.right != "Wall":
-            if (self.KB.check(["W" + str(row - 1) + "," + str(col)]) and self.KB.check(["S" + str(row - 1) + "," + str(col - 1)])) or (self.KB.check(["W" + str(row + 1) + "," + str(col)]) and self.KB.check(["S" + str(row + 1) + "," + str(col - 1)])):
+            if self.KB.check(["W"+str(row-1)+","+str(col)]) and self.KB.check(["~S"+str(row-1)+","+str(col+1)]) or self.KB.check(["W"+str(row+1)+","+str(col)]) and self.KB.check(["~S"+str(row+1)+","+str(col+1)]):
                 self.kill_wumpus("Right")
                 # self.state.unvisited_safe.append(current_node.right)
         if current_node.down != "Wall":
-            if (self.KB.check(["W" + str(row) + "," + str(col - 1)]) and self.KB.check(["~S" + str(row + 1) + "," + str(col - 1)])) or (self.KB.check(["W" + str(row) + "," + str(col + 1)]) and self.KB.check(["~S" + str(row + 1) + "," + str(col + 1)])):
+            if self.KB.check(["W"+str(row)+","+str(col-1)]) and self.KB.check(["~S"+str(row+1)+","+str(col-1)]) or self.KB.check(["W"+str(row)+","+str(col+1)]) and self.KB.check(["~S"+str(row+1)+","+str(col+1)]):
                 self.kill_wumpus("Down")
                 # self.state.unvisited_safe.append(current_node.down)
         if current_node.left != "Wall":
-            if (self.KB.check(["W" + str(row - 1) + "," + str(col)]) and self.KB.check(["~S" + str(row - 1) + "," + str(col - 1)])) or (self.KB.check(["W" + str(row + 1) + "," + str(col)]) and self.KB.check(["~S" + str(row + 1) + "," + str(col - 1)])):
+            if self.KB.check(["W"+str(row-1)+","+str(col)]) and self.KB.check(["~S"+str(row-1)+","+str(col-1)]) or self.KB.check(["W"+str(row+1)+","+str(col)]) and self.KB.check(["~S"+str(row+1)+","+str(col-1)]):
                 self.kill_wumpus("Left")
                 # self.state.unvisited_safe.append(current_node.left)
         if current_node.up != "Wall":
-            if (self.KB.check(["W" + str(row) + "," + str(col - 1)]) and self.KB.check(["~S" + str(row - 1) + "," + str(col - 1)])) or (self.KB.check(["W" + str(row) + "," + str(col + 1)]) and self.KB.check(["~S" + str(row - 1) + "," + str(col + 1)])):
+            if self.KB.check(["W"+str(row)+","+str(col-1)]) and self.KB.check(["~S"+str(row-1)+","+str(col-1)]) or self.KB.check(["W"+str(row)+","+str(col+1)]) and self.KB.check(["~S"+str(row-1)+","+str(col+1)]):
                 self.kill_wumpus("Up")
                 # self.state.unvisited_safe.append(current_node.up)
+
+        # if current_node.right != "Wall":
+        #     if (self.KB.check(["W" + str(row - 1) + "," + str(col)]) and self.KB.check(["S" + str(row - 1) + "," + str(col - 1)])) or (self.KB.check(["W" + str(row + 1) + "," + str(col)]) and self.KB.check(["S" + str(row + 1) + "," + str(col - 1)])):
+        #         self.kill_wumpus("Right")
+        #         # self.state.unvisited_safe.append(current_node.right)
+        # if current_node.down != "Wall":
+        #     if (self.KB.check(["W" + str(row) + "," + str(col - 1)]) and self.KB.check(["~S" + str(row + 1) + "," + str(col - 1)])) or (self.KB.check(["W" + str(row) + "," + str(col + 1)]) and self.KB.check(["~S" + str(row + 1) + "," + str(col + 1)])):
+        #         self.kill_wumpus("Down")
+        #         # self.state.unvisited_safe.append(current_node.down)
+        # if current_node.left != "Wall":
+        #     if (self.KB.check(["W" + str(row - 1) + "," + str(col)]) and self.KB.check(["~S" + str(row - 1) + "," + str(col - 1)])) or (self.KB.check(["W" + str(row + 1) + "," + str(col)]) and self.KB.check(["~S" + str(row + 1) + "," + str(col - 1)])):
+        #         self.kill_wumpus("Left")
+        #         # self.state.unvisited_safe.append(current_node.left)
+        # if current_node.up != "Wall":
+        #     if (self.KB.check(["W" + str(row) + "," + str(col - 1)]) and self.KB.check(["~S" + str(row - 1) + "," + str(col - 1)])) or (self.KB.check(["W" + str(row) + "," + str(col + 1)]) and self.KB.check(["~S" + str(row - 1) + "," + str(col + 1)])):
+        #         self.kill_wumpus("Up")
+        #         # self.state.unvisited_safe.append(current_node.up)
 
     def kill_wumpus(self, direction):
         self.killing_wumpus = True
