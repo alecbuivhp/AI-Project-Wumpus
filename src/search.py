@@ -1,5 +1,5 @@
 import heapq
-from src.bind import *
+from bind import *
 
 class Search:
     def __init__(self,graph,start,goals,visited_states,current_direction):

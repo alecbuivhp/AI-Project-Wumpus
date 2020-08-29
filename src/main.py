@@ -6,7 +6,7 @@ import time
 # Propositional logic agent 
 import gamestate, agent
 
-DELAY = 100
+DELAY = 50
 
 class Board:
     def __init__(self, world):
@@ -30,22 +30,22 @@ class Board:
         self.scoreFont = font.Font(family='KacstBook', size=22)
 
         # Load images
-        self.DOOR = PhotoImage(file='../assets/door.png')
-        self.TILE = PhotoImage(file='../assets/floor.png')
-        self.GOLD_TILE = PhotoImage(file='../assets/floor_gold.png')
-        self.WUMPUS = PhotoImage(file='../assets/wumpus.png')
-        self.GOLD = PhotoImage(file='../assets/gold.png')
-        self.PIT = PhotoImage(file='../assets/pit.png')
-        self.TERRAIN = PhotoImage(file='../assets/terrain.png')
-        self.PLAYER_DOWN = PhotoImage(file='../assets/agent_down.png')
-        self.PLAYER_UP = PhotoImage(file='../assets/agent_up.png')
-        self.PLAYER_LEFT = PhotoImage(file='../assets/agent_left.png')
-        self.PLAYER_RIGHT = PhotoImage(file='../assets/agent_right.png')
-        self.ARROW_DOWN = PhotoImage(file='../assets/arrow_down.png')
-        self.ARROW_UP = PhotoImage(file='../assets/arrow_up.png')
-        self.ARROW_LEFT = PhotoImage(file='../assets/arrow_left.png')
-        self.ARROW_RIGHT = PhotoImage(file='../assets/arrow_right.png')
-        self.SCORE = PhotoImage(file='../assets/score_icon.png')
+        self.DOOR = PhotoImage(file='assets/door.png')
+        self.TILE = PhotoImage(file='assets/floor.png')
+        self.GOLD_TILE = PhotoImage(file='assets/floor_gold.png')
+        self.WUMPUS = PhotoImage(file='assets/wumpus.png')
+        self.GOLD = PhotoImage(file='assets/gold.png')
+        self.PIT = PhotoImage(file='assets/pit.png')
+        self.TERRAIN = PhotoImage(file='assets/terrain.png')
+        self.PLAYER_DOWN = PhotoImage(file='assets/agent_down.png')
+        self.PLAYER_UP = PhotoImage(file='assets/agent_up.png')
+        self.PLAYER_LEFT = PhotoImage(file='assets/agent_left.png')
+        self.PLAYER_RIGHT = PhotoImage(file='assets/agent_right.png')
+        self.ARROW_DOWN = PhotoImage(file='assets/arrow_down.png')
+        self.ARROW_UP = PhotoImage(file='assets/arrow_up.png')
+        self.ARROW_LEFT = PhotoImage(file='assets/arrow_left.png')
+        self.ARROW_RIGHT = PhotoImage(file='assets/arrow_right.png')
+        self.SCORE = PhotoImage(file='assets/score_icon.png')
 
         # Game state
         self.gameState = bind.GameState.NOT_RUNNING
@@ -225,8 +225,9 @@ class Board:
 
             adj = self.world.get_Adjacents(arrow_loc[0], arrow_loc[1])
             for a in adj:
-                self.canvas.delete(self.warnings[a[0]][a[1]][1])
-                self.warnings[a[0]][a[1]][1] = None
+                if not self.world.listTiles[a[0]][a[1]].getStench():
+                    self.canvas.delete(self.warnings[a[0]][a[1]][1])
+                    self.warnings[a[0]][a[1]][1] = None
 
             # END GAME ?
             if not self.world.leftWumpus() and not self.world.leftGold():
@@ -261,31 +262,40 @@ class Board:
             if not self.world.leftWumpus() and not self.world.leftGold():
                 self.endGame("Clear")
 
-
     def endGame(self, reason):
-        self.canvas.delete("all")
-        self.canvas.config(width=64 * self.world.width, height=64 * self.world.height)
-        self.canvas.create_rectangle(0, 0, 64 * self.world.width, 64 * self.world.height, fill='#704917')
-
-        endFont = font.Font(family='KacstBook', size=35, weight='bold')
-        self.canvas.create_text((64 * self.world.width) // 2, (64 * self.world.height) // 2, fill='#ffffff', font=endFont, text='GAME ENDED', anchor=CENTER)
-
-        reasonFont = font.Font(family='KacstBook', size=25)
-        if reason == 'Pit':
-            self.canvas.create_text((64 * self.world.width) // 2, ((64 * self.world.height) // 2) // 2 + 64, fill='#d5d5d5', font=reasonFont, text='You fell into a Pit', anchor=CENTER)
-        elif reason == 'Wumpus':
-            self.canvas.create_text((64 * self.world.width) // 2, ((64 * self.world.height) // 2) // 2 + 64, fill='#d5d5d5', font=reasonFont, text='You were killed by a Wumpus', anchor=CENTER)
-        elif reason == 'Climb':
-            self.canvas.create_text((64 * self.world.width) // 2, ((64 * self.world.height) // 2) // 2 + 64, fill='#d5d5d5', font=reasonFont, text='You climb out of the Cave', anchor=CENTER)
-        elif reason == 'Clear':
-            self.canvas.create_text((64 * self.world.width) // 2, ((64 * self.world.height) // 2) // 2 + 64, fill='#d5d5d5', font=reasonFont, text='You cleared the Map', anchor=CENTER)
-
-        self.canvas.create_image((64 * self.world.width) // 2 - 70, ((64 * self.world.height) // 2) + 64 + 30, image=self.SCORE, anchor=NW)
-        self.canvas.create_text((64 * self.world.width) // 2, ((64 * self.world.height) // 2) + 124 - 30, fill='#ffff00', font=self.scoreFont, text=str(self.score), anchor=NW)
-
-        self.root.unbind("<Key>")
-        
         self.gameState = bind.GameState.NOT_RUNNING
+        time.sleep(2)
+        for i in range(self.world.height):
+            for j in range(self.world.width):
+                if self.terrains[i][j]:
+                    self.canvas.delete(self.terrains[i][j])
+        
+        print(reason)
+
+    # def endGame(self, reason):
+    #     self.canvas.delete("all")
+    #     self.canvas.config(width=64 * self.world.width, height=64 * self.world.height)
+    #     self.canvas.create_rectangle(0, 0, 64 * self.world.width, 64 * self.world.height, fill='#704917')
+
+    #     endFont = font.Font(family='KacstBook', size=35, weight='bold')
+    #     self.canvas.create_text((64 * self.world.width) // 2, (64 * self.world.height) // 2, fill='#ffffff', font=endFont, text='GAME ENDED', anchor=CENTER)
+
+    #     reasonFont = font.Font(family='KacstBook', size=25)
+    #     if reason == 'Pit':
+    #         self.canvas.create_text((64 * self.world.width) // 2, ((64 * self.world.height) // 2) // 2 + 64, fill='#d5d5d5', font=reasonFont, text='You fell into a Pit', anchor=CENTER)
+    #     elif reason == 'Wumpus':
+    #         self.canvas.create_text((64 * self.world.width) // 2, ((64 * self.world.height) // 2) // 2 + 64, fill='#d5d5d5', font=reasonFont, text='You were killed by a Wumpus', anchor=CENTER)
+    #     elif reason == 'Climb':
+    #         self.canvas.create_text((64 * self.world.width) // 2, ((64 * self.world.height) // 2) // 2 + 64, fill='#d5d5d5', font=reasonFont, text='You climb out of the Cave', anchor=CENTER)
+    #     elif reason == 'Clear':
+    #         self.canvas.create_text((64 * self.world.width) // 2, ((64 * self.world.height) // 2) // 2 + 64, fill='#d5d5d5', font=reasonFont, text='You cleared the Map', anchor=CENTER)
+
+    #     self.canvas.create_image((64 * self.world.width) // 2 - 70, ((64 * self.world.height) // 2) + 64 + 30, image=self.SCORE, anchor=NW)
+    #     self.canvas.create_text((64 * self.world.width) // 2, ((64 * self.world.height) // 2) + 124 - 30, fill='#ffff00', font=self.scoreFont, text=str(self.score), anchor=NW)
+
+    #     self.root.unbind("<Key>")
+        
+    #     self.gameState = bind.GameState.NOT_RUNNING
 
     ############################# INPUT AND UPDATE GAME #############################
 
@@ -380,7 +390,7 @@ class Board:
 ##########################################################################################################
 #FIX 10G-0P-10W
 wumpus_world = world.WumpusWorld()
-wumpus_world.read_Map('../map/10G-10P-10W-base.txt')
+wumpus_world.read_Map('map/10G-10P-10W-base.txt')
 # wumpus_world.generate_Map((0, 0), 10, 10, 10, 10, 10)
 
 board = Board(wumpus_world)

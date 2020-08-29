@@ -2,7 +2,7 @@ import gamestate
 import kb
 import bind
 import world
-from src.search import *
+from search import *
 
 # from src.gamestate import *
 # from src.kb import *

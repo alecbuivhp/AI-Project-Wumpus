@@ -103,7 +103,7 @@ class WumpusWorld:
         for i in range(self.__numWumpus):
             while True:
                 randomPos = (randrange(self.height), randrange(self.width))
-                if not self.listTiles[randomPos[0]][randomPos[1]].getPit() and not self.listTiles[randomPos[0]][randomPos[1]].getWumpus() and not self.listTiles[randomPos[0]][randomPos[1]].getGold():
+                if not randomPos == self.doorPos and not self.listTiles[randomPos[0]][randomPos[1]].getPit() and not self.listTiles[randomPos[0]][randomPos[1]].getWumpus() and not self.listTiles[randomPos[0]][randomPos[1]].getGold():
                     self.listTiles[randomPos[0]][randomPos[1]].setWumpus()
                     adj = self.get_Adjacents(randomPos[0], randomPos[1])
                     for a in adj:
