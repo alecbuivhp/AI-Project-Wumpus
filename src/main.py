@@ -6,7 +6,7 @@ import time
 # Propositional logic agent 
 import gamestate, agent
 
-DELAY = 1500
+DELAY = 100
 
 class Board:
     def __init__(self, world):
@@ -30,22 +30,22 @@ class Board:
         self.scoreFont = font.Font(family='KacstBook', size=22)
 
         # Load images
-        self.DOOR = PhotoImage(file='assets/door.png')
-        self.TILE = PhotoImage(file='assets/floor.png')
-        self.GOLD_TILE = PhotoImage(file='assets/floor_gold.png')
-        self.WUMPUS = PhotoImage(file='assets/wumpus.png')
-        self.GOLD = PhotoImage(file='assets/gold.png')
-        self.PIT = PhotoImage(file='assets/pit.png')
-        self.TERRAIN = PhotoImage(file='assets/terrain.png')
-        self.PLAYER_DOWN = PhotoImage(file='assets/agent_down.png')
-        self.PLAYER_UP = PhotoImage(file='assets/agent_up.png')
-        self.PLAYER_LEFT = PhotoImage(file='assets/agent_left.png')
-        self.PLAYER_RIGHT = PhotoImage(file='assets/agent_right.png')
-        self.ARROW_DOWN = PhotoImage(file='assets/arrow_down.png')
-        self.ARROW_UP = PhotoImage(file='assets/arrow_up.png')
-        self.ARROW_LEFT = PhotoImage(file='assets/arrow_left.png')
-        self.ARROW_RIGHT = PhotoImage(file='assets/arrow_right.png')
-        self.SCORE = PhotoImage(file='assets/score_icon.png')
+        self.DOOR = PhotoImage(file='../assets/door.png')
+        self.TILE = PhotoImage(file='../assets/floor.png')
+        self.GOLD_TILE = PhotoImage(file='../assets/floor_gold.png')
+        self.WUMPUS = PhotoImage(file='../assets/wumpus.png')
+        self.GOLD = PhotoImage(file='../assets/gold.png')
+        self.PIT = PhotoImage(file='../assets/pit.png')
+        self.TERRAIN = PhotoImage(file='../assets/terrain.png')
+        self.PLAYER_DOWN = PhotoImage(file='../assets/agent_down.png')
+        self.PLAYER_UP = PhotoImage(file='../assets/agent_up.png')
+        self.PLAYER_LEFT = PhotoImage(file='../assets/agent_left.png')
+        self.PLAYER_RIGHT = PhotoImage(file='../assets/agent_right.png')
+        self.ARROW_DOWN = PhotoImage(file='../assets/arrow_down.png')
+        self.ARROW_UP = PhotoImage(file='../assets/arrow_up.png')
+        self.ARROW_LEFT = PhotoImage(file='../assets/arrow_left.png')
+        self.ARROW_RIGHT = PhotoImage(file='../assets/arrow_right.png')
+        self.SCORE = PhotoImage(file='../assets/score_icon.png')
 
         # Game state
         self.gameState = bind.GameState.NOT_RUNNING
@@ -378,7 +378,7 @@ class Board:
 ##########################################################################################################
 
 wumpus_world = world.WumpusWorld()
-wumpus_world.read_Map('map\original.txt')
+wumpus_world.read_Map('../map/original.txt')
 # wumpus_world.generate_Map((0, 0), 10, 10, 10, 10, 10)
 
 board = Board(wumpus_world)

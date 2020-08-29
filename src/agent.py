@@ -96,7 +96,7 @@ class Level_solver(Agent):
             if tile_at_loc.getStench():
                 self.handle_stench(current_node)
                 # self.check_wumpus(current_node)
-                # return bind.Action.SHOOT
+                # self.killing_wumpus = True
             elif not tile_at_loc.getStench():
                 self.handle_no_stench(current_node)
             if tile_at_loc.getBreeze():
@@ -118,6 +118,8 @@ class Level_solver(Agent):
                     self.move = self.move_list(cost_path)
         if self.move:
             move = self.move.pop(0)
+            if move == bind.Action.SHOOT:
+                self.killing_wumpus = False
             return move
 
 
@@ -203,15 +205,15 @@ class Level_solver(Agent):
         if current_node.right != "Wall":
             if (self.KB.check(["W" + str(row - 1) + "," + str(col)]) and self.KB.check(["S" + str(row - 1) + "," + str(col - 1)])) or (self.KB.check(["W" + str(row + 1) + "," + str(col)]) and self.KB.check(["S" + str(row + 1) + "," + str(col - 1)])):
                 self.kill_wumpus("Right")
-        if current_node.up != "Wall":
+        if current_node.down != "Wall":
             if (self.KB.check(["W" + str(row) + "," + str(col - 1)]) and self.KB.check(["~S" + str(row + 1) + "," + str(col - 1)])) or (self.KB.check(["W" + str(row) + "," + str(col + 1)]) and self.KB.check(["~S" + str(row + 1) + "," + str(col + 1)])):
-                self.kill_wumpus("Up")
+                self.kill_wumpus("Down")
         if current_node.left != "Wall":
             if (self.KB.check(["W" + str(row - 1) + "," + str(col)]) and self.KB.check(["~S" + str(row - 1) + "," + str(col - 1)])) or (self.KB.check(["W" + str(row + 1) + "," + str(col)]) and self.KB.check(["~S" + str(row + 1) + "," + str(col - 1)])):
                 self.kill_wumpus("Left")
-        if current_node.down != "Wall":
+        if current_node.up != "Wall":
             if (self.KB.check(["W" + str(row) + "," + str(col - 1)]) and self.KB.check(["~S" + str(row - 1) + "," + str(col - 1)])) or (self.KB.check(["W" + str(row) + "," + str(col + 1)]) and self.KB.check(["~S" + str(row - 1) + "," + str(col + 1)])):
-                self.kill_wumpus("Down")
+                self.kill_wumpus("Up")
 
     def kill_wumpus(self, direction):
         self.killing_wumpus = True
@@ -328,6 +330,7 @@ class Level_solver(Agent):
                     move_list.append(bind.Action.LEFT)
                     direction = bind.Action.LEFT
                     current_node = self.state.state[current_node.left]
+
         if self.exit:
             move_list.append(bind.Action.CLIMB)
         if self.agent.current_direction != move_list[0]:
