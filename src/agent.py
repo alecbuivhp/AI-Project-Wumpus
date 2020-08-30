@@ -60,6 +60,7 @@ class Level_solver(Agent):
                 self.state.unvisited_safe.append(current_node.left)
             elif self.agent.current_direction == Action.DOWN:
                 self.state.unvisited_safe.append(current_node.down)
+            self.clearKB()
         self.scream = False
         
         for item in self.state.visited[-10:]:
@@ -101,7 +102,6 @@ class Level_solver(Agent):
             move = self.move.pop(0)
             if move == bind.Action.SHOOT:
                 self.killing_wumpus = False
-                self.clearKB()
             return move
 
 
