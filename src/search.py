@@ -2,18 +2,20 @@ import heapq
 from bind import *
 
 class Search:
-    def __init__(self,graph,start,goals,visited_states,current_direction):
+    def __init__(self, graph, start, goals, visited_states, current_direction):
         self.start = start
         self.goals = goals
         self.visited_states = visited_states
         self.current_direction = current_direction
         self.graph = graph
+
     def unicost(self):
         frontier = []
         expansion = [[0, self.current_direction, self.start, [self.start]]]
+        
         if self.start in self.goals:
             return expansion[-1][3]
-        #HEAPQ FIX LATER
+
         for item in [Action.RIGHT, Action.UP, Action.LEFT, Action.DOWN]:
             if item == Action.RIGHT:
                 if self.graph[self.start].right in self.visited_states or self.graph[self.start].right in self.goals:

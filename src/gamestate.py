@@ -1,19 +1,8 @@
 import world
-# import tile
-
-#from src import world
-#from src.tile import *
 
 class Node():
     def __init__(self, row, col, world):
-        # self.row = row
-        # self.col = col
         self.name = str(row) + ',' + str(col)
-        # self.left = ''
-        # self.right = ''
-        # self.up = ''
-        # self.down = '' #1,2.left = "2,2"
-
         self.row = row
         self.col = col
         adjacents = world.get_Adjacents(row,col)
@@ -40,7 +29,6 @@ class Game_State:
         self.max_col = world.width
 
     def add_state(self,node):
-        #FIX ME LATER
         if node.left == '':
             node.left = 'Wall'
         if node.right == '':
