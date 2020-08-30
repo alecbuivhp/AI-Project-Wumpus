@@ -16,7 +16,7 @@ class Knowledge_base:
 
 
     def check(self,query):
-        KB_temp = [[atomic for atomic in sentence] for sentence in self.KB]
+        KB_temp = self.KB.copy()
         KB_temp.append(query)
         for item1 in KB_temp:
             if len(item1) > 0:

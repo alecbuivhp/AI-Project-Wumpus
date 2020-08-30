@@ -54,19 +54,21 @@ class Level_solver(Agent):
         if self.scream == True:
             if self.agent.current_direction == Action.RIGHT:
                 self.state.unvisited_safe.append(current_node.right)
+                self.clearKB(current_node.right)
             elif self.agent.current_direction == Action.UP:
                 self.state.unvisited_safe.append(current_node.up)
+                self.clearKB(current_node.up)
             elif self.agent.current_direction == Action.LEFT:
                 self.state.unvisited_safe.append(current_node.left)
+                self.clearKB(current_node.left)
             elif self.agent.current_direction == Action.DOWN:
                 self.state.unvisited_safe.append(current_node.down)
-            self.clearKB()
-        self.scream = False
+                self.clearKB(current_node.down)
+            self.scream = False
+
         
         for item in self.state.visited[-10:]:
             row, col = item.split(',')
-            if item == '7,7':
-                i = 1
             tile = self.world.listTiles[int(row)][int(col)]
             if not tile.getStench() and self.KB.check(["~S"+str(item)]):
                 self.clear_stench_KB(item)
@@ -105,13 +107,14 @@ class Level_solver(Agent):
             return move
 
 
-    def clear_stench_KB(self,node):
+    def clear_stench_KB(self, node):
         self.KB.KB.remove(['S'+node])
 
-    def clearKB(self):
+    def clearKB(self, node):
+        node_name = 'W' + node
         remove = []
         for item in self.KB.KB:
-            if item[0][0] == 'W' or item[0][1] == 'W':
+            if node_name in item:
                 remove.append(item)
         for item in remove:
             self.KB.KB.remove(item)
