@@ -8,11 +8,8 @@ class Agent:
     def __init__(self, state):
         self.current_state = state
         self.current_direction = bind.Action.RIGHT
-        self.has_gold = 0
-        self.has_killed_wumpus = 0
-        self.is_leaving = False
 
-    def move_foward(self,state):
+    def move_foward(self, state):
         if self.current_direction == bind.Action.LEFT and state[self.current_state].left != 'Wall':
             self.current_state = state[self.current_state].left
         elif self.current_direction == bind.Action.RIGHT and state[self.current_state].right != 'Wall':
@@ -26,17 +23,15 @@ class Agent:
 
 class Level_solver(Agent):
     #FIX starting node
-    def __init__(self,world,starting_node): #Starting node = (1,1)
+    def __init__(self, world, starting_node): #Starting node = (1,1)
         self.state = gamestate.Game_State(world)
         self.state.add_state(gamestate.Node(starting_node.row, starting_node.col,world))
         self.agent = Agent(state = starting_node.name)
         self.KB = kb.Knowledge_base()
         self.KB.add(["~P" + str(starting_node.name)])
         self.KB.add(["~W" + str(starting_node.name)])
-        self.direction = ['Up','Left','Down','Right']
         self.exit = False
         self.move = []
-        self.start_stench = False
         self.starting_node = starting_node
         self.world = world
         self.currentState = bind.Action.RIGHT

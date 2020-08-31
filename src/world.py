@@ -21,7 +21,7 @@ class WumpusWorld:
         if j - 1 >= 0:
             adj.append((i, j - 1))
         if j + 1 <= self.width - 1:
-            adj.append((i, j + 1))
+            adj.append((i, j + 1))  
 
         return adj
 
@@ -29,6 +29,7 @@ class WumpusWorld:
         try:
             with open(filename, 'r') as f:
                 lines = f.read().splitlines()
+                lines = lines[1:]
                 self.height = len(lines)
 
                 tiles = []
@@ -145,5 +146,3 @@ class WumpusWorld:
         
         for i in string:
             print(i)
-
-        print()

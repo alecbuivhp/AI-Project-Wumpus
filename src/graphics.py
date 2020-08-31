@@ -146,7 +146,7 @@ class Board:
 
 
         # Output frame
-        self.buttonStep = Button(self.outputFrame, text='NEXT STEP', height=2, width=30, command=lambda: self.changeRunMode(0))
+        self.buttonStep = Button(self.outputFrame, text='STEP', height=2, width=30, command=lambda: self.changeRunMode(0))
         self.buttonRun = Button(self.outputFrame, text='RUN ALL', height=2, width=30, command=lambda: self.changeRunMode(1))
         self.buttonStep['font'] = self.buttonFont
         self.buttonRun['font'] = self.buttonFont
@@ -362,6 +362,8 @@ class Board:
 
         if self.runMode == 1:
             while self.gameState == bind.GameState.RUNNING:
+                self.senseObject()
+                self.actionArea.see(END)
                 action = self.agent.getAction()
 
                 # Update KB
@@ -427,7 +429,7 @@ class Board:
                         self.canvas.itemconfig(self.score_display, text=str(self.score))
                         self.endGame("Climb")
                 
-                self.senseObject()
+                # self.senseObject()
                 self.actionArea.see(END)
                 self.root.update()
                 self.root.after(DELAY)
@@ -436,6 +438,9 @@ class Board:
 
         elif self.runMode == 0:
             if self.gameState == bind.GameState.RUNNING:
+                self.senseObject()
+                self.actionArea.see(END)
+
                 action = self.agent.getAction()
 
                 # Update KB
@@ -501,7 +506,7 @@ class Board:
                         self.canvas.itemconfig(self.score_display, text=str(self.score))
                         self.endGame("Climb")
                 
-                self.senseObject()
+                # self.senseObject()
                 self.actionArea.see(END)
                 self.root.update()
                 self.root.after(DELAY)

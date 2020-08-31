@@ -2,11 +2,11 @@ class Knowledge_base:
     def __init__(self):
         self.KB = []
 
-    def add(self,sentence):
+    def add(self, sentence):
         if sentence not in self.KB:
             self.KB.append(sentence)
 
-    def compare(self,query1,query2):
+    def compare(self, query1, query2):
         if len(query1) == 1:
             for item in query2:
                 if query1[0][0] == "~" and item[0:] == query1[0][1:]:
