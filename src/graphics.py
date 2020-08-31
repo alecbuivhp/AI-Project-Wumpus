@@ -378,7 +378,7 @@ class Board:
                         else:
                             temp_string += j
                         if j != self.agent.KB.KB[i][-1]:
-                            temp_string += ' ∧ '
+                            temp_string += ' ∨ '
                     self.KBArea.insert(END, temp_string + '\n')
                     self.KBArea.see(END)
 
@@ -455,7 +455,7 @@ class Board:
                         else:
                             temp_string += j
                         if j != self.agent.KB.KB[i][-1]:
-                            temp_string += ' ∧ '
+                            temp_string += ' ∨ '
                     self.KBArea.insert(END, temp_string + '\n')
                     self.KBArea.see(END)
 
